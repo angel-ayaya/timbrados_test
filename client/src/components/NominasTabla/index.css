@@ -1,0 +1,26 @@
+@media print {
+    body * {
+      visibility: hidden;
+    }
+    .media-wrapper,
+    .media-wrapper * {
+      visibility: visible;
+    }
+    .media-wrapper {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: auto; /* Asegúrate de que la altura se ajusta al contenido o establece una altura específica si es necesario */
+      margin: 0;
+      box-shadow: none; /* Eliminar sombras o cualquier estilo que no quieras en la impresión */
+      border: none; /* Eliminar bordes si no son necesarios */
+    }
+    button {
+      display: none; /* Esto ocultará todos los botones, asegúrate de que es el comportamiento deseado */
+    }
+  }
+
+  .media-wrapper{
+    font-size: 12px;
+  }

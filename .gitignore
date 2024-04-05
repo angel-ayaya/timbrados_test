@@ -1,0 +1,26 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore build output
+/build
+
+# Ignore environment variables file
+.env
+
+# Ignore log files
+*.log
+
+# Ignore database files
+*.db
+
+# Ignore package-lock.json file
+package-lock.json
+
+# Ignore client build output
+/client/build
+
+# Ignore server build output
+/server/build
+
+# Ignore client build output
+/client/build
