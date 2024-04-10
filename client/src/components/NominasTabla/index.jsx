@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { apiUrl } from "../../enviroment";
+import Header from "../Header";
 import "./index.css";
 
 const TablaNominas = () => {
@@ -54,38 +55,67 @@ const TablaNominas = () => {
 
   return (
     <div>
-      <div>
-        <form onSubmit={handleSubmit} className="max-w-lg mx-auto my-8">
-          <div className="mb-4">
+      <div className="w-[50vw] mx-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="flex justify-center my-6 items-center"
+        >
+          <div className="mb-4 px-2">
             <label htmlFor="">Número de empleado</label>
             <input
               type="text"
               value={numEmpleado}
               onChange={(e) => setNumEmpleado(e.target.value)}
-              placeholder="Número de empleado"
-              className="form-input mt-1 block w-full border-gray-300 shadow-sm rounded-md p-2"
+              placeholder=""
+              className="form-input mt-1 block w-full border-gray-300 border shadow-sm rounded-md p-2"
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 px-2">
             <label htmlFor="">Año</label>
             <input
               type="text"
               value={anio}
               onChange={(e) => setAnio(e.target.value)}
-              placeholder="Año"
-              className="form-input mt-1 block w-full border-gray-300 shadow-sm rounded-md p-2"
+              placeholder=""
+              className="form-input mt-1 block w-full border-gray-300 border shadow-sm rounded-md p-2"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="">Tipo de Nomina</label>
-            <input
-              type="text"
+          <div className="mb-4 px-2">
+            <label
+              htmlFor="tipoNomina"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Tipo de Nómina
+            </label>
+            <select
+              id="tipoNomina"
               value={nomina}
               onChange={(e) => setNomina(e.target.value)}
-              placeholder="Tipo de nómina"
-              className="form-input mt-1 block w-full border-gray-300 shadow-sm rounded-md p-2"
-            />
+              className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="">Seleccione un tipo</option>
+              <option value="1">1 - Burocracia</option>
+              <option value="2">2 - Magisterio</option>
+              <option value="3">3 - Normal Urbana</option>
+              <option value="4">4 - Jubilados Burocracia</option>
+              <option value="8">8 - Contratos</option>
+              <option value="9">9 - Jubilados Magisterio</option>
+              <option value="11">11 - Fondo Pensión Burocracia</option>
+              <option value="12">12 - Fondo Pensión Magisterio</option>
+              <option value="24">24 - Magisterio Federalizado</option>
+              <option value="25">25 - Telebachillerato</option>
+              <option value="26">26 - Telebachillerato Contratos</option>
+              <option value="28">28 - Centro de Control de Confianza</option>
+              <option value="50">50 - Contratos Infraestructura</option>
+              <option value="57">57 - Contratos 5 al Millar</option>
+              <option value="88">88 - Contratos D</option>
+              <option value="61">61 - Infraestructura</option>
+              <option value="60">60 - FOFAE</option>
+              <option value="63">63 - Servicio Nacional de Empleo</option>
+              {/* Añade más opciones según sea necesario */}
+            </select>
           </div>
+
           <div className="text-center">
             <button
               type="submit"
@@ -99,42 +129,27 @@ const TablaNominas = () => {
       {/* Div wrapper */}
       <div className="media-wrapper">
         {/* Solo intenta acceder a `nombre` si `nominas` es un array con al menos un elemento */}
-        <div className="text-center mb-2">
-          <h1 className="text-xl">
-            Reporte de timbrado para el ejercicio{" "}
-            {nominas && nominas[0] ? nominas[0].anio : ""}
-          </h1>
-          <h2 className="text-lg">
-            Nombre: {nominas && nominas[0] ? nominas[0].nombre : ""}
-          </h2>
-          <h2>
-            Número de empleado:{" "}
-            {nominas && nominas[0] ? nominas[0].numempleado : ""}
-          </h2>
-          <h2>RFC: {nominas && nominas[0] ? nominas[0].rfcre : ""}</h2>
-          <h2>CURP: {nominas && nominas[0] ? nominas[0].lcurp : ""}</h2>
-          <h2>NÓMINA: {nominas && nominas[0] ? nominas[0].nomina : ""}</h2>
-        </div>
+        <Header nominas={nominas} />
         {cargando ? (
-          <div>Cargando...</div>
+          <div className="text-center">Cargando...</div>
         ) : nominas ? (
           <div className="w-full flex justify-center">
             <table className="table-auto">
               <thead>
-                <tr>
-                  <th className="bg-gray-300 text-center">Mod</th>
-                  <th className="bg-gray-300 text-center">Año</th>
-                  <th className="bg-gray-300 text-center">Ciclo</th>
-                  <th className="bg-gray-300 text-center">Perext</th>
-                  <th className="bg-gray-300 text-center">Folio</th>
-                  <th className="bg-gray-300 text-center">Mes</th>
-                  <th className="bg-gray-300 text-center">Folio Fiscal</th>
-                  <th className="bg-gray-300 text-center">ISR Retenido</th>
-                  <th className="bg-gray-300 text-center">Gravados</th>
-                  <th className="bg-gray-300 text-center">Exentos</th>
-                  <th className="bg-gray-300 text-center">Percepciones</th>
-                  <th className="bg-gray-300 text-center">Deducciones</th>
-                  <th className="bg-gray-300 text-center">Total Neto</th>
+                <tr className="border-2">
+                  <th className="bg-gray-300 text-center px-2">Mod</th>
+                  <th className="bg-gray-300 text-center px-2">Año</th>
+                  <th className="bg-gray-300 text-center px-2">Ciclo</th>
+                  <th className="bg-gray-300 text-center px-2">Perext</th>
+                  <th className="bg-gray-300 text-center px-2">Folio</th>
+                  <th className="bg-gray-300 text-center px-2">Mes</th>
+                  <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
+                  <th className="bg-gray-300 text-center ">ISR Retenido</th>
+                  <th className="bg-gray-300 text-center px-2">Gravados</th>
+                  <th className="bg-gray-300 text-center px-2">Exentos</th>
+                  <th className="bg-gray-300 text-center px-2">Percepciones</th>
+                  <th className="bg-gray-300 text-center px-2">Deducciones</th>
+                  <th className="bg-gray-300 text-center px-2">Total Neto</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,7 +174,7 @@ const TablaNominas = () => {
                       </td>
                     </tr>
                   ))}
-                <tr>
+                <tr className="text-center border-2 font-bold">
                   <td className="bg-gray-300" colSpan="6"></td>
                   <td className="bg-gray-300">TOTAL</td>
                   <td className="bg-gray-300">{totalImporteRet.toFixed(2)}</td>
@@ -175,7 +190,7 @@ const TablaNominas = () => {
             </table>
           </div>
         ) : (
-          <div>No hay datos</div>
+          <div className="text-center">No hay datos</div>
         )}
       </div>
       <div className="w-full flex justify-center my-8">
