@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { apiUrl } from "../../enviroment";
 import "./index.css";
 
 const TablaNominas = () => {
@@ -10,7 +11,8 @@ const TablaNominas = () => {
 
   const fetchNominas = () => {
     setCargando(true);
-    const url = `http://localhost:3001/api/nominas/${numEmpleado}/${anio}/${nomina}`;
+    const url = `${apiUrl}/api/nominas/${numEmpleado}/${anio}/${nomina}`;
+    console.log(url);
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -53,7 +55,6 @@ const TablaNominas = () => {
   return (
     <div>
       <div>
-        
         <form onSubmit={handleSubmit} className="max-w-lg mx-auto my-8">
           <div className="mb-4">
             <label htmlFor="">Número de empleado</label>
@@ -158,9 +159,7 @@ const TablaNominas = () => {
                       </td>
                     </tr>
                   ))}
-              </tbody>
-              <tfoot>
-                <tr className="text-center">
+                <tr>
                   <td className="bg-gray-300" colSpan="6"></td>
                   <td className="bg-gray-300">TOTAL</td>
                   <td className="bg-gray-300">{totalImporteRet.toFixed(2)}</td>
@@ -172,7 +171,7 @@ const TablaNominas = () => {
                   <td className="bg-gray-300">{totalDeducciones.toFixed(2)}</td>
                   <td className="bg-gray-300">{totalNeto.toFixed(2)}</td>
                 </tr>
-              </tfoot>
+              </tbody>
             </table>
           </div>
         ) : (
@@ -180,7 +179,12 @@ const TablaNominas = () => {
         )}
       </div>
       <div className="w-full flex justify-center my-8">
-      <button  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200" onClick={() => window.print()}>Imprimir esta página</button>
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200"
+          onClick={() => window.print()}
+        >
+          Imprimir esta página
+        </button>
       </div>
     </div>
   );
