@@ -1,21 +1,46 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../../enviroment";
 import Header from "../Header";
 import "./index.css";
 
-const TablaNominas = () => {
+const TablasNominas = () => {
   const [nominas, setNominas] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [numEmpleado, setNumEmpleado] = useState("");
   const [anio, setAnio] = useState("");
   const [nomina, setNomina] = useState("");
 
+  const navigate = useNavigate();
+
   const fetchNominas = () => {
     setCargando(true);
     const url = `${apiUrl}/api/nominas/${numEmpleado}/${anio}/${nomina}`;
-    console.log(url);
-    fetch(url)
-      .then((response) => response.json())
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      console.error("No access token available");
+      setCargando(false);
+      navigate("/login"); // Redirigir a login si no hay token
+      return;
+    }
+
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.status === 401) {
+          throw new Error("Unauthorized: Redirecting to login.");
+        }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
         setNominas(data);
         setCargando(false);
@@ -23,6 +48,16 @@ const TablaNominas = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
         setCargando(false);
+        console.log("Error fetching data:", error);
+        if (
+          error.message.includes("Forbidden") ||
+          error.message.includes("Unauthorized") ||
+          error.message.includes("403")
+        ) {
+          localStorage.removeItem("accessToken"); // Opcional: limpiar token viejo
+          localStorage.removeItem("refreshToken"); // Opcional: limpiar refresh token
+          navigate("/login"); // Redirigir a login en caso de Unauthorized
+        }
       });
   };
 
@@ -205,4 +240,4 @@ const TablaNominas = () => {
   );
 };
 
-export default TablaNominas;
+export default TablasNominas;
