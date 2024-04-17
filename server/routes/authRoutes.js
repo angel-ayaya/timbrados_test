@@ -11,7 +11,7 @@ const generateTokens = (user) => {
   const accessToken = jwt.sign(
     { id: user.id, username: user.username },
     process.env.JWT_ACCESS_SECRET,
-    { expiresIn: "10s" }
+    { expiresIn: "12h" }
   );
   const refreshToken = jwt.sign(
     { id: user.id, username: user.username },
