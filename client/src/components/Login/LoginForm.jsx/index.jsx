@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from "../../enviroment";
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -9,7 +10,7 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${apiUrl}api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
