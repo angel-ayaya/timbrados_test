@@ -8,7 +8,6 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate,
 } from "react-router-dom";
 
 function App() {
@@ -18,7 +17,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
-          path="/home"
+          path="/"
           element={
             <PrivateRoute>
               <Home />
