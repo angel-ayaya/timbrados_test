@@ -19,7 +19,7 @@ const Navbar = () => {
       <ul className="flex space-x-4">
         {isLoggedIn() ? (
           <>
-            <li><button onClick={() => navigate('/home')}>Home</button></li>
+            <li><button onClick={() => navigate('/')}>Home</button></li>
             <li><button onClick={handleLogout}>Logout</button></li>
           </>
         ) : (
