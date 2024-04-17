@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiUrl } from "../../enviroment";
+import { apiUrl } from "../../../enviroment";
 
 function LoginForm() {
   const [username, setUsername] = useState('');
@@ -10,7 +10,7 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${apiUrl}api/auth/login`, {
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ function LoginForm() {
       if (response.ok) {
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
-        navigate('/home'); // Navegar a la ruta Home
+        navigate('/'); // Navegar a la ruta Home
       } else {
         alert(data.message || 'Error al iniciar sesión');
       }
