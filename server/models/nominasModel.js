@@ -20,8 +20,28 @@ const getNomina = async (numempleado, anio, nomina) => {
   }
 };
 
+const subirNuevosTimbrados = async (registros) => {
+  for (const registro of registros) {
+    await pool.query(
+      `INSERT INTO timbrado2017 (repositorio, modulo, nomina, anio, ciclo, perext, numempleado, statcancela, totpercep, totdeducc, totgravado, totexento, totsueldo, tototrosded, totisr, folio, aniopago, mespago, totalimpret, basegrabada, subtotal, nombranum, nombre, key, clavenombramiento, pactimbrado, foliofiscal, rfcre, lcurp)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29)`,
+      [
+        registro.repositorio, registro.modulo, registro.nomina, registro.anio, registro.ciclo,
+        registro.perext, registro.numempleado, registro.statcancela, registro.totpercep,
+        registro.totdeducc, registro.totgravado, registro.totexento, registro.totsueldo,
+        registro.tototrosded, registro.totisr, registro.folio, registro.aniopago, registro.mespago,
+        registro.totalimpret, registro.basegrabada, registro.subtotal, registro.nombranum, registro.nombre,
+        registro.key, registro.clavenombramiento, registro.pactimbrado, registro.foliofiscal, registro.rfcre,
+        registro.lcurp
+      ]
+    );
+  }
+}
+
+/* 
+* Deprecated function posiblemente no se use
+*/
 const getSumNomina = async (numempleado, anio, nomina) => {
-  const quertBody = `SUM(totalimpret), SUM(totgravado), SUM(totexento), SUM(totpercep), SUM(totdeducc), SUM(subtotal)`;
   const query = `
   SELECT 
     SUM(totalimpret) AS totalimpret, 
@@ -53,5 +73,6 @@ const getSumNomina = async (numempleado, anio, nomina) => {
 
 module.exports = {
   getNomina,
+  subirNuevosTimbrados,
   getSumNomina,
 };
