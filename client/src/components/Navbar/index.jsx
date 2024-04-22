@@ -19,8 +19,9 @@ const Navbar = () => {
       <ul className="flex space-x-4">
         {isLoggedIn() ? (
           <>
-            <li><button onClick={() => navigate('/')}>Home</button></li>
-            <li><button onClick={handleLogout}>Logout</button></li>
+            <li><button onClick={() => navigate('/')}>Inicio</button></li>
+            <li><button onClick={() => navigate('/upload')}>Cargar Datos</button></li>
+            <li><button onClick={handleLogout}>Cerrar Sesion</button></li>
           </>
         ) : (
           <li><button onClick={() => navigate('/login')}>Login</button></li>
