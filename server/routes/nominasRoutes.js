@@ -2,7 +2,7 @@
 const express = require("express");
 const verifyToken = require("../middleware/verifyToken");
 const router = express.Router();
-const { getNomina, subirNuevosTimbrados } = require("../models/nominasModel"); // Asegúrate de que la ruta sea correcta
+const { getNomina, subirNuevosTimbrados, getTiposNomina } = require("../models/nominasModel"); // Asegúrate de que la ruta sea correcta
 
 // Asumiendo que tus parámetros se pasan en la URL de esta forma: /nominas/:numempleado/:anio/:nomina
 router.get(
@@ -24,6 +24,19 @@ router.get(
   }
 );
 
+/**
+ * Obtener nóminas de la tabla tipos_nomina
+ */
+router.get("/nominas/tipos", async (req, res) => {
+  try {
+    const tiposNomina = await getTiposNomina();
+    res.json(tiposNomina);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error del servidor");
+  }  
+});
+
 // Actualizar datos de la tabla timbrados2017 con datos de un json
 router.post("/nominas/carga", verifyToken, async (req, res) => {
   try {
@@ -31,9 +44,8 @@ router.post("/nominas/carga", verifyToken, async (req, res) => {
 
     // Lógica para actualizar la base de datos
     await subirNuevosTimbrados(registros);
-    
+
     res.json({ message: "Datos actualizados correctamente" });
-    
   } catch (err) {
     console.error(err);
     res.status(500).send("Error del servidor");
