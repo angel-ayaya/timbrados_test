@@ -42,7 +42,6 @@ const TablasNominas = () => {
         return response.json();
       })
       .then((data) => {
-        console.log("Tipos de nómina:", data);
         setTiposNomina(data);
       })
       .catch((error) => {
