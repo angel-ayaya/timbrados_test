@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "../../enviroment";
 import Header from "../Header";
@@ -10,8 +10,57 @@ const TablasNominas = () => {
   const [numEmpleado, setNumEmpleado] = useState("");
   const [anio, setAnio] = useState("");
   const [nomina, setNomina] = useState("");
+  const [tiposNomina, setTiposNomina] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchTiposNomina();
+  }, []);
+
+  const fetchTiposNomina = () => {
+    const url = `${apiUrl}/api/nominas/tipos`;
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!accessToken) {
+      console.error("No access token available");
+      navigate("/login"); // Redirigir a login si no hay token
+      return;
+    }
+
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Tipos de nómina:", data);
+        setTiposNomina(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        if (
+          error.message.includes("Forbidden") ||
+          error.message.includes("Unauthorized") ||
+          error.message.includes("403")
+        ) {
+          localStorage.removeItem("accessToken"); // Opcional: limpiar token viejo
+          localStorage.removeItem("refreshToken"); // Opcional: limpiar refresh token
+          navigate("/login"); // Redirigir a login en caso de Unauthorized
+        }
+      });
+  };
+
+  
+
 
   const fetchNominas = () => {
     setCargando(true);
@@ -60,6 +109,8 @@ const TablasNominas = () => {
         }
       });
   };
+
+
 
   // Esta función se llama cuando el formulario se envía.
   const handleSubmit = (e) => {
@@ -127,27 +178,14 @@ const TablasNominas = () => {
               value={nomina}
               onChange={(e) => setNomina(e.target.value)}
               className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
             >
               <option value="">Seleccione un tipo</option>
-              <option value="1">1 - Burocracia</option>
-              <option value="2">2 - Magisterio</option>
-              <option value="3">3 - Normal Urbana</option>
-              <option value="4">4 - Jubilados Burocracia</option>
-              <option value="8">8 - Contratos</option>
-              <option value="9">9 - Jubilados Magisterio</option>
-              <option value="11">11 - Fondo Pensión Burocracia</option>
-              <option value="12">12 - Fondo Pensión Magisterio</option>
-              <option value="24">24 - Magisterio Federalizado</option>
-              <option value="25">25 - Telebachillerato</option>
-              <option value="26">26 - Telebachillerato Contratos</option>
-              <option value="28">28 - Centro de Control de Confianza</option>
-              <option value="50">50 - Contratos Infraestructura</option>
-              <option value="57">57 - Contratos 5 al Millar</option>
-              <option value="88">88 - Contratos D</option>
-              <option value="61">61 - Infraestructura</option>
-              <option value="60">60 - FOFAE</option>
-              <option value="63">63 - Servicio Nacional de Empleo</option>
-              {/* Añade más opciones según sea necesario */}
+              {tiposNomina.map((nomina) => (
+                <option key={nomina.id} value={nomina.numero}>
+                 {nomina.numero} - {nomina.tipo}
+                </option>
+              ))}
             </select>
           </div>
 
