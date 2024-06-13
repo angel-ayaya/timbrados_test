@@ -73,8 +73,22 @@ const getSumNomina = async (numempleado, anio, nomina) => {
   }
 };
 
+const getTiposNomina = async () => {
+  const query = `SELECT * FROM tipos_nomina`;
+  try {
+    const result = await pool.query(query);
+    return result.rows;
+  }
+  catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+
 module.exports = {
   getNomina,
   subirNuevosTimbrados,
   getSumNomina,
+  getTiposNomina
 };
