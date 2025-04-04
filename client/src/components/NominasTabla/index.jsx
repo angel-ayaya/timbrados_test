@@ -24,7 +24,7 @@ const TablasNominas = () => {
 
     if (!accessToken) {
       console.error("No access token available");
-      navigate("/login"); // Redirigir a login si no hay token
+      navigate("/login");
       return;
     }
 
@@ -51,15 +51,12 @@ const TablasNominas = () => {
           error.message.includes("Unauthorized") ||
           error.message.includes("403")
         ) {
-          localStorage.removeItem("accessToken"); // Opcional: limpiar token viejo
-          localStorage.removeItem("refreshToken"); // Opcional: limpiar refresh token
-          navigate("/login"); // Redirigir a login en caso de Unauthorized
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          navigate("/login");
         }
       });
   };
-
-  
-
 
   const fetchNominas = () => {
     setCargando(true);
@@ -69,7 +66,7 @@ const TablasNominas = () => {
     if (!accessToken) {
       console.error("No access token available");
       setCargando(false);
-      navigate("/login"); // Redirigir a login si no hay token
+      navigate("/login");
       return;
     }
 
@@ -96,47 +93,63 @@ const TablasNominas = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
         setCargando(false);
-        console.log("Error fetching data:", error);
         if (
           error.message.includes("Forbidden") ||
           error.message.includes("Unauthorized") ||
           error.message.includes("403")
         ) {
-          localStorage.removeItem("accessToken"); // Opcional: limpiar token viejo
-          localStorage.removeItem("refreshToken"); // Opcional: limpiar refresh token
-          navigate("/login"); // Redirigir a login en caso de Unauthorized
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          navigate("/login");
         }
       });
   };
 
-
-
-  // Esta función se llama cuando el formulario se envía.
   const handleSubmit = (e) => {
-    e.preventDefault(); // Evitar el envío predeterminado del formulario
-    setNominas(null); // Limpiar los datos de nominas
-    fetchNominas(); // Llamar a fetchNominas para actualizar los datos según la entrada del usuario
+    e.preventDefault();
+    setNominas(null);
+    fetchNominas();
   };
 
-  const totalImporteRet = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0)
-    : 0;
-  const totalGravado = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.totgravado || 0), 0)
-    : 0;
-  const totalExento = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.totexento || 0), 0)
-    : 0;
-  const totalPercepciones = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.totpercep || 0), 0)
-    : 0;
-  const totalDeducciones = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.totdeducc || 0), 0)
-    : 0;
-  const subtotal = nominas
-    ? nominas.reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0)
-    : 0;
+  // Filtrar para EXCLUIR ciclo 24 y perext 2
+  const excluidos = nominas 
+  ? nominas.filter(nomina => (nomina.ciclo === 24 && nomina.perext === 2 && nomina.anio === 2024))
+  : [];
+
+
+  const filteredNominas = nominas 
+    ? nominas.filter(nomina => !(nomina.ciclo === 24 && nomina.perext === 2))
+    : [];
+  
+  // Calcular totales solo con los datos filtrados
+  const totalImporteRet = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0);
+  const totalGravado = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.totgravado || 0), 0);
+  const totalExento = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.totexento || 0), 0);
+  const totalPercepciones = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.totpercep || 0), 0);
+  const totalDeducciones = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.totdeducc || 0), 0);
+  const subtotal = filteredNominas
+    .reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0);
   const totalNeto = subtotal - totalDeducciones;
+
+   // Calcular totales solo con los datos filtrados
+   const totalImporteRet1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0);
+ const totalGravado1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.totgravado || 0), 0);
+ const totalExento1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.totexento || 0), 0);
+ const totalPercepciones1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.totpercep || 0), 0);
+ const totalDeducciones1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.totdeducc || 0), 0);
+ const subtotal1 = excluidos
+   .reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0);
+ const totalNeto1 = subtotal1 - totalDeducciones1;
 
   return (
     <div>
@@ -198,9 +211,8 @@ const TablasNominas = () => {
           </div>
         </form>
       </div>
-      {/* Div wrapper */}
+
       <div className="media-wrapper">
-        {/* Solo intenta acceder a `nombre` si `nominas` es un array con al menos un elemento */}
         <Header nominas={nominas} />
         {cargando ? (
           <div className="text-center">Cargando...</div>
@@ -225,27 +237,25 @@ const TablasNominas = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* Verifica si `nominas` existe y luego mapea */}
-                {nominas &&
-                  nominas.map((nomina, index) => (
-                    <tr className="text-center" key={index}>
-                      <td className="border-2">{nomina.modulo}</td>
-                      <td className="border-2">{nomina.anio}</td>
-                      <td className="border-2">{nomina.ciclo}</td>
-                      <td className="border-2">{nomina.perext}</td>
-                      <td className="border-2">{nomina.folio}</td>
-                      <td className="border-2">{nomina.mespago}</td>
-                      <td className="border-2">{nomina.foliofiscal}</td>
-                      <td className="border-2">{nomina.totalimpret}</td>
-                      <td className="border-2">{nomina.totgravado}</td>
-                      <td className="border-2">{nomina.totexento}</td>
-                      <td className="border-2">{nomina.totpercep}</td>
-                      <td className="border-2">{nomina.totdeducc}</td>
-                      <td className="border-2">
-                        {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
+                {filteredNominas.map((nomina, index) => (
+                  <tr className="text-center" key={index}>
+                    <td className="border-2">{nomina.modulo}</td>
+                    <td className="border-2">{nomina.anio}</td>
+                    <td className="border-2">{nomina.ciclo}</td>
+                    <td className="border-2">{nomina.perext}</td>
+                    <td className="border-2">{nomina.folio}</td>
+                    <td className="border-2">{nomina.mespago}</td>
+                    <td className="border-2">{nomina.foliofiscal}</td>
+                    <td className="border-2">{nomina.totalimpret}</td>
+                    <td className="border-2">{nomina.totgravado}</td>
+                    <td className="border-2">{nomina.totexento}</td>
+                    <td className="border-2">{nomina.totpercep}</td>
+                    <td className="border-2">{nomina.totdeducc}</td>
+                    <td className="border-2">
+                      {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
                 <tr className="text-center border-2 font-bold">
                   <td className="bg-gray-300" colSpan="6"></td>
                   <td className="bg-gray-300">TOTAL</td>
@@ -264,7 +274,74 @@ const TablasNominas = () => {
         ) : (
           <div className="text-center">No hay datos</div>
         )}
+
+        <center style={{ marginTop: "20px" }}>
+        <h2><strong>El fondo de ahorro retenido a los trabajadores en 2024 se registró bajo el concepto de "Otros Pagos", 
+          en cumplimiento de la normativa fiscal vigente, por lo que no constituye un ingreso acumulable para efectos de 
+          la autoridad fiscal.</strong></h2>
+      </center>
+        {cargando ? (
+          <div className="text-center">Cargando...</div>
+        ) : nominas ? (
+          <div className="w-full flex justify-center">
+            <table className="table-auto">
+              <thead>
+                <tr className="border-2">
+                  <th className="bg-gray-300 text-center px-2">Mod</th>
+                  <th className="bg-gray-300 text-center px-2">Año</th>
+                  <th className="bg-gray-300 text-center px-2">Ciclo</th>
+                  <th className="bg-gray-300 text-center px-2">Perext</th>
+                  <th className="bg-gray-300 text-center px-2">Folio</th>
+                  <th className="bg-gray-300 text-center px-2">Mes</th>
+                  <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
+                  <th className="bg-gray-300 text-center ">ISR Retenido</th>
+                  <th className="bg-gray-300 text-center px-2">Gravados</th>
+                  <th className="bg-gray-300 text-center px-2">Exentos</th>
+                  <th className="bg-gray-300 text-center px-2">Percepciones</th>
+                  <th className="bg-gray-300 text-center px-2">Deducciones</th>
+                  <th className="bg-gray-300 text-center px-2">Total Neto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {excluidos.map((nomina, index) => (
+                  <tr className="text-center" key={index}>
+                    <td className="border-2">{nomina.modulo}</td>
+                    <td className="border-2">{nomina.anio}</td>
+                    <td className="border-2">{nomina.ciclo}</td>
+                    <td className="border-2">{nomina.perext}</td>
+                    <td className="border-2">{nomina.folio}</td>
+                    <td className="border-2">{nomina.mespago}</td>
+                    <td className="border-2">{nomina.foliofiscal}</td>
+                    <td className="border-2">{nomina.totalimpret}</td>
+                    <td className="border-2">{nomina.totgravado}</td>
+                    <td className="border-2">{nomina.totexento}</td>
+                    <td className="border-2">{nomina.totpercep}</td>
+                    <td className="border-2">{nomina.totdeducc}</td>
+                    <td className="border-2">
+                      {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="text-center border-2 font-bold">
+                  <td className="bg-gray-300" colSpan="6"></td>
+                  <td className="bg-gray-300">TOTAL</td>
+                  <td className="bg-gray-300">{totalImporteRet1.toFixed(2)}</td>
+                  <td className="bg-gray-300">{totalGravado1.toFixed(2)}</td>
+                  <td className="bg-gray-300">{totalExento1.toFixed(2)}</td>
+                  <td className="bg-gray-300">
+                    {totalPercepciones1.toFixed(2)}
+                  </td>
+                  <td className="bg-gray-300">{totalDeducciones1.toFixed(2)}</td>
+                  <td className="bg-gray-300">{totalNeto1.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center">No hay datos</div>
+        )}
       </div>
+
       <div className="w-full flex justify-center my-8">
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-colors duration-200"
