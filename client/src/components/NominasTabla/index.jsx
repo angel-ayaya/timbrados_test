@@ -111,17 +111,24 @@ const TablasNominas = () => {
     fetchNominas();
   };
 
-  // Filtrar para EXCLUIR ciclo 24 y perext 2
-  const excluidos = nominas 
-  ? nominas.filter(nomina => (nomina.ciclo === 24 && nomina.perext === 2 && nomina.anio === 2024))
+  // Determinar si es nómina especial (1 o 12) y año 2024
+const esNominaEspecial = nominas && nominas.some(n => 
+  (n.nomina === 1 || n.nomina === 11) && n.anio === 2024
+);
+
+// Filtrar datos
+const filteredNominas = nominas 
+  ? esNominaEspecial
+    ? nominas.filter(n => !(n.ciclo === 24 && n.perext === 2)) // Excluir para nóminas 1/12 en 2024
+    : [...nominas] // Mostrar todo para otros casos
   : [];
 
+// Datos excluidos (solo para nóminas 1/12 en 2024)
+const excluidos = nominas && esNominaEspecial 
+  ? nominas.filter(n => n.ciclo === 24 && n.perext === 2) 
+  : [];
 
-  const filteredNominas = nominas 
-    ? nominas.filter(nomina => !(nomina.ciclo === 24 && nomina.perext === 2))
-    : [];
-  
-  // Calcular totales solo con los datos filtrados
+  // Calcular totales para la tabla principal
   const totalImporteRet = filteredNominas
     .reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0);
   const totalGravado = filteredNominas
@@ -136,20 +143,20 @@ const TablasNominas = () => {
     .reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0);
   const totalNeto = subtotal - totalDeducciones;
 
-   // Calcular totales solo con los datos filtrados
-   const totalImporteRet1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0);
- const totalGravado1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.totgravado || 0), 0);
- const totalExento1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.totexento || 0), 0);
- const totalPercepciones1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.totpercep || 0), 0);
- const totalDeducciones1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.totdeducc || 0), 0);
- const subtotal1 = excluidos
-   .reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0);
- const totalNeto1 = subtotal1 - totalDeducciones1;
+  // Calcular totales para los excluidos (solo para nóminas 1 y 12)
+  const totalImporteRet1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.totalimpret || 0), 0);
+  const totalGravado1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.totgravado || 0), 0);
+  const totalExento1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.totexento || 0), 0);
+  const totalPercepciones1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.totpercep || 0), 0);
+  const totalDeducciones1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.totdeducc || 0), 0);
+  const subtotal1 = excluidos
+    .reduce((acc, curr) => acc + Number(curr.subtotal || 0), 0);
+  const totalNeto1 = subtotal1 - totalDeducciones1;
 
   return (
     <div>
@@ -217,126 +224,128 @@ const TablasNominas = () => {
         {cargando ? (
           <div className="text-center">Cargando...</div>
         ) : nominas ? (
-          <div className="w-full flex justify-center">
-            <table className="table-auto">
-              <thead>
-                <tr className="border-2">
-                  <th className="bg-gray-300 text-center px-2">Mod</th>
-                  <th className="bg-gray-300 text-center px-2">Año</th>
-                  <th className="bg-gray-300 text-center px-2">Ciclo</th>
-                  <th className="bg-gray-300 text-center px-2">Perext</th>
-                  <th className="bg-gray-300 text-center px-2">Folio</th>
-                  <th className="bg-gray-300 text-center px-2">Mes</th>
-                  <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
-                  <th className="bg-gray-300 text-center ">ISR Retenido</th>
-                  <th className="bg-gray-300 text-center px-2">Gravados</th>
-                  <th className="bg-gray-300 text-center px-2">Exentos</th>
-                  <th className="bg-gray-300 text-center px-2">Percepciones</th>
-                  <th className="bg-gray-300 text-center px-2">Deducciones</th>
-                  <th className="bg-gray-300 text-center px-2">Total Neto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredNominas.map((nomina, index) => (
-                  <tr className="text-center" key={index}>
-                    <td className="border-2">{nomina.modulo}</td>
-                    <td className="border-2">{nomina.anio}</td>
-                    <td className="border-2">{nomina.ciclo}</td>
-                    <td className="border-2">{nomina.perext}</td>
-                    <td className="border-2">{nomina.folio}</td>
-                    <td className="border-2">{nomina.mespago}</td>
-                    <td className="border-2">{nomina.foliofiscal}</td>
-                    <td className="border-2">{nomina.totalimpret}</td>
-                    <td className="border-2">{nomina.totgravado}</td>
-                    <td className="border-2">{nomina.totexento}</td>
-                    <td className="border-2">{nomina.totpercep}</td>
-                    <td className="border-2">{nomina.totdeducc}</td>
-                    <td className="border-2">
-                      {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
-                    </td>
+          <>
+            {/* Tabla Principal */}
+            <div className="w-full flex justify-center">
+              <table className="table-auto">
+                <thead>
+                  <tr className="border-2">
+                    <th className="bg-gray-300 text-center px-2">Mod</th>
+                    <th className="bg-gray-300 text-center px-2">Año</th>
+                    <th className="bg-gray-300 text-center px-2">Ciclo</th>
+                    <th className="bg-gray-300 text-center px-2">Perext</th>
+                    <th className="bg-gray-300 text-center px-2">Folio</th>
+                    <th className="bg-gray-300 text-center px-2">Mes</th>
+                    <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
+                    <th className="bg-gray-300 text-center ">ISR Retenido</th>
+                    <th className="bg-gray-300 text-center px-2">Gravados</th>
+                    <th className="bg-gray-300 text-center px-2">Exentos</th>
+                    <th className="bg-gray-300 text-center px-2">Percepciones</th>
+                    <th className="bg-gray-300 text-center px-2">Deducciones</th>
+                    <th className="bg-gray-300 text-center px-2">Total Neto</th>
                   </tr>
-                ))}
-                <tr className="text-center border-2 font-bold">
-                  <td className="bg-gray-300" colSpan="6"></td>
-                  <td className="bg-gray-300">TOTAL</td>
-                  <td className="bg-gray-300">{totalImporteRet.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalGravado.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalExento.toFixed(2)}</td>
-                  <td className="bg-gray-300">
-                    {totalPercepciones.toFixed(2)}
-                  </td>
-                  <td className="bg-gray-300">{totalDeducciones.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalNeto.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="text-center">No hay datos</div>
-        )}
+                </thead>
+                <tbody>
+                  {filteredNominas.map((nomina, index) => (
+                    <tr className="text-center" key={index}>
+                      <td className="border-2">{nomina.modulo}</td>
+                      <td className="border-2">{nomina.anio}</td>
+                      <td className="border-2">{nomina.ciclo}</td>
+                      <td className="border-2">{nomina.perext}</td>
+                      <td className="border-2">{nomina.folio}</td>
+                      <td className="border-2">{nomina.mespago}</td>
+                      <td className="border-2">{nomina.foliofiscal}</td>
+                      <td className="border-2">{nomina.totalimpret}</td>
+                      <td className="border-2">{nomina.totgravado}</td>
+                      <td className="border-2">{nomina.totexento}</td>
+                      <td className="border-2">{nomina.totpercep}</td>
+                      <td className="border-2">{nomina.totdeducc}</td>
+                      <td className="border-2">
+                        {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="text-center border-2 font-bold">
+                    <td className="bg-gray-300" colSpan="6"></td>
+                    <td className="bg-gray-300">TOTAL</td>
+                    <td className="bg-gray-300">{totalImporteRet.toFixed(2)}</td>
+                    <td className="bg-gray-300">{totalGravado.toFixed(2)}</td>
+                    <td className="bg-gray-300">{totalExento.toFixed(2)}</td>
+                    <td className="bg-gray-300">
+                      {totalPercepciones.toFixed(2)}
+                    </td>
+                    <td className="bg-gray-300">{totalDeducciones.toFixed(2)}</td>
+                    <td className="bg-gray-300">{totalNeto.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-        <center style={{ marginTop: "20px" }}>
-        <h2><strong>El fondo de ahorro retenido a los trabajadores en 2024 se registró bajo el concepto de "Otros Pagos", 
-          en cumplimiento de la normativa fiscal vigente, por lo que no constituye un ingreso acumulable para efectos de 
-          la autoridad fiscal.</strong></h2>
-      </center>
-        {cargando ? (
-          <div className="text-center">Cargando...</div>
-        ) : nominas ? (
-          <div className="w-full flex justify-center">
-            <table className="table-auto">
-              <thead>
-                <tr className="border-2">
-                  <th className="bg-gray-300 text-center px-2">Mod</th>
-                  <th className="bg-gray-300 text-center px-2">Año</th>
-                  <th className="bg-gray-300 text-center px-2">Ciclo</th>
-                  <th className="bg-gray-300 text-center px-2">Perext</th>
-                  <th className="bg-gray-300 text-center px-2">Folio</th>
-                  <th className="bg-gray-300 text-center px-2">Mes</th>
-                  <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
-                  <th className="bg-gray-300 text-center ">ISR Retenido</th>
-                  <th className="bg-gray-300 text-center px-2">Gravados</th>
-                  <th className="bg-gray-300 text-center px-2">Exentos</th>
-                  <th className="bg-gray-300 text-center px-2">Percepciones</th>
-                  <th className="bg-gray-300 text-center px-2">Deducciones</th>
-                  <th className="bg-gray-300 text-center px-2">Total Neto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {excluidos.map((nomina, index) => (
-                  <tr className="text-center" key={index}>
-                    <td className="border-2">{nomina.modulo}</td>
-                    <td className="border-2">{nomina.anio}</td>
-                    <td className="border-2">{nomina.ciclo}</td>
-                    <td className="border-2">{nomina.perext}</td>
-                    <td className="border-2">{nomina.folio}</td>
-                    <td className="border-2">{nomina.mespago}</td>
-                    <td className="border-2">{nomina.foliofiscal}</td>
-                    <td className="border-2">{nomina.totalimpret}</td>
-                    <td className="border-2">{nomina.totgravado}</td>
-                    <td className="border-2">{nomina.totexento}</td>
-                    <td className="border-2">{nomina.totpercep}</td>
-                    <td className="border-2">{nomina.totdeducc}</td>
-                    <td className="border-2">
-                      {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="text-center border-2 font-bold">
-                  <td className="bg-gray-300" colSpan="6"></td>
-                  <td className="bg-gray-300">TOTAL</td>
-                  <td className="bg-gray-300">{totalImporteRet1.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalGravado1.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalExento1.toFixed(2)}</td>
-                  <td className="bg-gray-300">
-                    {totalPercepciones1.toFixed(2)}
-                  </td>
-                  <td className="bg-gray-300">{totalDeducciones1.toFixed(2)}</td>
-                  <td className="bg-gray-300">{totalNeto1.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <center style={{ marginTop: "20px" }}>
+              <h2><strong></strong></h2>
+            </center>
+
+            {/* Tabla de Excluidos (solo para nóminas 1 y 12) */}
+            {esNominaEspecial && excluidos.length > 0 && (
+              <div className="w-full flex flex-col items-center mt-8">
+              <h3 className="text-center mb-4 font-bold">El fondo de ahorro retenido a los trabajadores en 2024 se registró bajo el concepto de "Otros Pagos", 
+                en cumplimiento de la normativa fiscal vigente, por lo que no constituye un ingreso acumulable para efectos de 
+                la autoridad fiscal.</h3>
+              <table className="table-auto">
+                  <thead>
+                    <tr className="border-2">
+                      <th className="bg-gray-300 text-center px-2">Mod</th>
+                      <th className="bg-gray-300 text-center px-2">Año</th>
+                      <th className="bg-gray-300 text-center px-2">Ciclo</th>
+                      <th className="bg-gray-300 text-center px-2">Perext</th>
+                      <th className="bg-gray-300 text-center px-2">Folio</th>
+                      <th className="bg-gray-300 text-center px-2">Mes</th>
+                      <th className="bg-gray-300 text-center px-2">Folio Fiscal</th>
+                      <th className="bg-gray-300 text-center ">ISR Retenido</th>
+                      <th className="bg-gray-300 text-center px-2">Gravados</th>
+                      <th className="bg-gray-300 text-center px-2">Exentos</th>
+                      <th className="bg-gray-300 text-center px-2">Percepciones</th>
+                      <th className="bg-gray-300 text-center px-2">Deducciones</th>
+                      <th className="bg-gray-300 text-center px-2">Total Neto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {excluidos.map((nomina, index) => (
+                      <tr className="text-center" key={index}>
+                        <td className="border-2">{nomina.modulo}</td>
+                        <td className="border-2">{nomina.anio}</td>
+                        <td className="border-2">{nomina.ciclo}</td>
+                        <td className="border-2">{nomina.perext}</td>
+                        <td className="border-2">{nomina.folio}</td>
+                        <td className="border-2">{nomina.mespago}</td>
+                        <td className="border-2">{nomina.foliofiscal}</td>
+                        <td className="border-2">{nomina.totalimpret}</td>
+                        <td className="border-2">{nomina.totgravado}</td>
+                        <td className="border-2">{nomina.totexento}</td>
+                        <td className="border-2">{nomina.totpercep}</td>
+                        <td className="border-2">{nomina.totdeducc}</td>
+                        <td className="border-2">
+                          {(nomina.subtotal - nomina.totdeducc).toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="text-center border-2 font-bold">
+                      <td className="bg-gray-300" colSpan="6"></td>
+                      <td className="bg-gray-300">TOTAL</td>
+                      <td className="bg-gray-300">{totalImporteRet1.toFixed(2)}</td>
+                      <td className="bg-gray-300">{totalGravado1.toFixed(2)}</td>
+                      <td className="bg-gray-300">{totalExento1.toFixed(2)}</td>
+                      <td className="bg-gray-300">
+                        {totalPercepciones1.toFixed(2)}
+                      </td>
+                      <td className="bg-gray-300">{totalDeducciones1.toFixed(2)}</td>
+                      <td className="bg-gray-300">{totalNeto1.toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center">No hay datos</div>
         )}
